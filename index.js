@@ -16,7 +16,9 @@ try {
   }
   console.log(installCommand)
   
-  exec.exec(installCommand)
+  exec.exec(installCommand).catch(function(e) {
+    core.setFailed(e.message)
+  })
 
 } catch (error){
   core.setFailed(error.message)
