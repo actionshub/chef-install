@@ -1,5 +1,5 @@
 const core = require('@actions/core');
-const spawn = require('child-process').spawn
+const exec = require('@actions/exec')
 
 
 try {
@@ -16,22 +16,8 @@ try {
     installCommand += ` -v ${version}`
   }
   console.log(installCommand)
-  var prc = spawn(installCommand);
-
-  //noinspection JSUnresolvedFunction
-  prc.stdout.setEncoding('utf8');
-  prc.stdout.on('data', function (data) {
-      var str = data.toString()
-      var lines = str.split(/(\r?\n)/g);
-      console.log(lines.join(""));
-  });
-
-  prc.on('close', function (code) {
-      console.log('process exit code ' + code);
-      if (code != 0){
-        core.setFailed('Install exited with error, see logs')
-      }
-  });
+  
+  await exec.exec(installCommand)
 
 } catch (error){
   core.setFailed(error.message)
