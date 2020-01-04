@@ -24,3 +24,16 @@ jobs:
     - name: install chef
       uses: actionshub/chef-installl@master
  ```
+
+## Envrionment Variables
+
+We support the following Environment Variables
+
+|name| default| description|
+|--- |------- |----------- |
+|channel| stable | Chef Channel to install, stable or current |
+|project | chef-workstation | Which product to install, see <https://docs.chef.io/install_omnibus.html> for the list |
+|version | latest | version to install |
+|omnitruckUrl| omnitruck.chef.io | which Omnitruck to use, default is Chef Official|
+
+By Changing the omnitruck Url you can also install Cinc projects
