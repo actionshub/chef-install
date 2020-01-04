@@ -19,7 +19,7 @@ try {
   }
 
   // Ensure script is executable and run it
-  exec.exec('ls -la ../*').catch(function(e) {
+  exec.exec('ls -la /home/runner/work/xor_test_cookbook').catch(function(e) {
     core.setFailed(e.message);
   })
   exec.exec('chmod +x ./entrypoint.sh').catch(function(e) {

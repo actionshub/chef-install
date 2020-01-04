@@ -21,8 +21,6 @@ jobs:
     steps:
     - name: Check out code
       uses: actions/checkout@master
-    - name: Run Chef Delivery
-      uses: actionshub/chef-delivery@master
-      env:
-        CHEF_LICENSE: accept-no-persist
-```
+    - name: install chef
+      uses: actionshub/chef-installl@master
+ ```
