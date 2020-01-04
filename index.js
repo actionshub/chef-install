@@ -4,10 +4,10 @@ const exec = require('@actions/exec')
 async function main() {
   try {
     // Get the variables we care about
-    const channel =- core.getInput('channel') || 'stable';
-    const project =- core.getInput('project') || 'chef-workstation';
-    const version =- core.getInput('version');
-    const omnitruckUrl =- core.getInput('omnitruckUrl') || 'omnitruck.chef.io';
+    const channel = core.getInput('channel') || 'stable';
+    const project = core.getInput('project') || 'chef-workstation';
+    const version = core.getInput('version');
+    const omnitruckUrl = core.getInput('omnitruckUrl') || 'omnitruck.chef.io';
     // Create the args that the bash script will need
     var channelParam = `-c ${channel}`
     var projectParam = `-P ${project}`
