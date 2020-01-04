@@ -19,6 +19,7 @@ try {
   }
 
   // Ensure script is executable and run it
+  console.log('foo')
   exec.exec('ls -la /home/runner/work/xor_test_cookbook').catch(function(e) {
     core.setFailed(e.message);
   })
