@@ -10,16 +10,18 @@ inputs:
     description: 'which chef project to install, chef-workstation or chefdk'
     required: false
     default: 'chef-workstation'
-  project:
-    description: 'Exact version to install, overrides channel'
+  version:
+    description: 'version to install, default is latest'
     required: false
   omnitruckUrl:
     description: 'Omnitruck base url'
     required: false
     default: 'omnitruck.chef.io'
-runs: |
-  curl -L https://omnitruck.chef.io/install.sh |
-  sudo bash -s -- -c stable -P chefdk
+runs: 
+  using: 'node12'
+  main: 'index.js'
+  # curl -L https://omnitruck.chef.io/install.sh |
+  # sudo bash -s -- -c stable -P chefdk
 branding:
   icon: 'tool'
   color: 'red'
