@@ -4,20 +4,18 @@ const exec = require('@actions/exec')
 
 try {
   // get the variables we want
-  exec.exec('printenv').catch(function(e) {
-    core.setFailed(e.message)
-  })
-  const channel =- core.getInput('channel');
-  const project =- core.getInput('project');
+  const channel =- core.getInput('channel') || 'stable';
+  const project =- core.getInput('project') || 'chef-workstation';
   const version =- core.getInput('version');
-  const omnitruckUrl =- core.getInput('omnitruckUrl');
+  const omnitruckUrl =- core.getInput('omnitruckUrl') || 'omnitruck.chef.io';
   console.log(`Installing ${project} on ${channel}`)
 
-  var installCommand = `curl -L ${omnitruckUrl}/install.sh | sudo bash -s -- -c ${channel} -P ${project}`
+  var installCommand = `curl -L https://${omnitruckUrl}/install.sh | sudo bash -s -- -c ${channel} -P ${project}`
   if (version) {
     console.log(`adding version pin to ${version}`)
     installCommand += ` -v ${version}`
   }
+
   exec.exec(installCommand).catch(function(e) {
     core.setFailed(e.message)
   })
