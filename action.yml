@@ -4,18 +4,18 @@ description: 'Installs Chef on your linux build agent with ease'
 inputs:
   channel:
     description: 'Chef Channel to install, stable or current'
-    required: false
+    required: true
     default: 'stable'
   project:
     description: 'which chef project to install, chef-workstation or chefdk'
-    required: false
+    required: true
     default: 'chef-workstation'
   version:
     description: 'version to install, default is latest'
     required: false
   omnitruckUrl:
     description: 'Omnitruck base url'
-    required: false
+    required: true
     default: 'omnitruck.chef.io'
 runs: 
   using: 'node12'
