@@ -12,7 +12,7 @@ try {
 
   exec.exec('sudo -v')
 
-  var installCommand = `curl -v -L https://${omnitruckUrl}/install.sh`
+  var installCommand = `curl -v -L https://${omnitruckUrl}/install.sh | grep http`
   if (version) {
     console.log(`adding version pin to ${version}`)
     installCommand += ` -v ${version}`
