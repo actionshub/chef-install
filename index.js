@@ -3,34 +3,28 @@ const exec = require('@actions/exec')
 
 
 try {
-  // get the variables we want
+  // Get the variables we care about
   const channel =- core.getInput('channel') || 'stable';
   const project =- core.getInput('project') || 'chef-workstation';
   const version =- core.getInput('version');
   const omnitruckUrl =- core.getInput('omnitruckUrl') || 'omnitruck.chef.io';
-  console.log(`Installing ${project} on ${channel}`)
-
-  var downloadCommand = `curl -v -L https://${omnitruckUrl}/install.sh -o install.sh`;
-
-  var installCommand = `sudo ./install.sh -c ${channel} -P ${project}`;
-
-  console.log(downloadCommand);
-  console.log(installCommand);
-
+  // Create the args that the bash script will need
+  var channelParam = `"-c ${channel}"`
+  var projectParam = `"-p ${project}"`
   if (version) {
-    console.log(`adding version pin to ${version}`);
-    installCommand += ` -v ${version}`;
+    versionParam = `"-v ${version}"`
+  }
+  else {
+    versionParam = ''
   }
 
-  const dc = exec.exec(downloadCommand).catch(function(e) {
-    core.setFailed(e.message);
-  })
-  const execRights = exec.exec('chmod +x ./install.sh').catch(function(e) {
-    core.setFailed(e.message);
-  });
-  const install = exec.exec(installCommand).catch(function(e) {
-    core.setFailed(e.message);
-  });
+  // Ensure script is executable and run it
+  exec.exec('chmod +x ./entrypoint.sh').catch(function(e) {
+      core.setFailed(e.message);
+    })
+  exec.exec(`./entrypoint.sh ${omnitruckUrl} ${channelParam} ${projectParam} ${versionParam}`).catch(function(e) {
+      core.setFailed(e.message);
+    })
 
 } catch (error){
   core.setFailed(error.message);
