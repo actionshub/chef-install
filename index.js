@@ -8,23 +8,28 @@ const runCommand = async function (command){
   })
 }
 
-try {
-  // Get the variables we care about
-  const channel =- core.getInput('channel') || 'stable';
-  const project =- core.getInput('project') || 'chef-workstation';
-  const version =- core.getInput('version');
-  const omnitruckUrl =- core.getInput('omnitruckUrl') || 'omnitruck.chef.io';
-  // Create the args that the bash script will need
-  var channelParam = `-c ${channel}`
-  var projectParam = `-p ${project}`
-  if (version) {
-    versionParam = `-v ${version}`
+async function main() {
+  try {
+    // Get the variables we care about
+    const channel =- core.getInput('channel') || 'stable';
+    const project =- core.getInput('project') || 'chef-workstation';
+    const version =- core.getInput('version');
+    const omnitruckUrl =- core.getInput('omnitruckUrl') || 'omnitruck.chef.io';
+    // Create the args that the bash script will need
+    var channelParam = `-c ${channel}`
+    var projectParam = `-P ${project}`
+    if (version) {
+      versionParam = `-v ${version}`
+    }
+    else {
+      versionParam = ''
+    }
+    await exec.exec(`curl -L https://${omnitruckUrl}/install.sh -o chefDownload.sh`)
+    await exec.exec(`sudo chmod +x chefDownload.sh`)
+    await exec.exec(`sudo ./chefDownload.sh ${channelParam} ${projectParam} ${versionParam}`)
+    await exec.exec(`rm -f chefDownload.sh`)
+  } catch (error){
+    core.setFailed(error.message);
   }
-  else {
-    versionParam = ''
-  }
-  runCommand(`script=$(curl -L https://${omnitruckUrl}/install.sh) && echo $script > chefDownload.sh && chmod +x ./chefDownload.sh && bash -s -- ${channelParam} ${projectParam} ${versionParam}`)
-
-} catch (error){
-  core.setFailed(error.message);
 }
+main()
