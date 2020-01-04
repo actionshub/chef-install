@@ -8,7 +8,6 @@ try {
   const project =- core.getInput('project');
   const version =- core.getInput('version');
   const omnitruckUrl =- core.getInput('omnitruckUrl');
-  console.log(`Hello ${omnitruckUrl}!`);
   console.log(`Installing ${project} on ${channel}`)
 
   var installCommand = `curl -L ${omnitruckUrl}/install.sh | sudo bash -s -- -c ${channel} -P ${project}`
@@ -17,7 +16,7 @@ try {
   }
   console.log(installCommand)
   
-  await exec.exec(installCommand)
+  exec.exec(installCommand)
 
 } catch (error){
   core.setFailed(error.message)
