@@ -12,6 +12,7 @@ try {
 
   var installCommand = `curl -L ${omnitruckUrl}/install.sh | sudo bash -s -- -c ${channel} -P ${project}`
   if (version) {
+    console.log(`adding version pin to ${version}`)
     installCommand += ` -v ${version}`
   }
   console.log(installCommand)
