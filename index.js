@@ -10,12 +10,17 @@ try {
   const omnitruckUrl =- core.getInput('omnitruckUrl') || 'omnitruck.chef.io';
   console.log(`Installing ${project} on ${channel}`)
 
-  var installCommand = `curl -L https://${omnitruckUrl}/install.sh | sudo /bin/sh -s -- -c ${channel} -P ${project}`
+  var downloadCommand = `curl -L https://${omnitruckUrl}/install.sh > /tmp/install.sh`
+
+  exec.exec(downloadCommand).catch(function(e) {
+    core.setFailed(e.message)
+  })
+
+  var installCommand = `sudo /bin/sh -s /tmp/install.sh -c ${channel} -P ${project}`
   if (version) {
     console.log(`adding version pin to ${version}`)
     installCommand += ` -v ${version}`
   }
-
   exec.exec(installCommand).catch(function(e) {
     core.setFailed(e.message)
   })
