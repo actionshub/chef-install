@@ -18,8 +18,8 @@ inputs:
     required: true
     default: 'omnitruck.chef.io'
 runs: 
-  using: 'node12'
-  main: 'index.js'
+  using: 'bash'
+  main: 'entrypoint.sh'
 branding:
   icon: 'tool'
   color: 'red'

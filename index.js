@@ -12,7 +12,7 @@ try {
 
   var downloadCommand = `curl -v -L https://${omnitruckUrl}/install.sh -o install.sh`;
 
-  var installCommand = `sudo /install.sh -c ${channel} -P ${project}`;
+  var installCommand = `sudo ./install.sh -c ${channel} -P ${project}`;
 
   console.log(downloadCommand);
   console.log(installCommand);
@@ -22,13 +22,15 @@ try {
     installCommand += ` -v ${version}`;
   }
 
-  exec.exec(downloadCommand).catch(function(e) {
+  const dc = exec.exec(downloadCommand).catch(function(e) {
     core.setFailed(e.message);
-  }).then(exec.exec('chmod +x ./install.sh').catch(function(e) {
-      core.setFailed(e.message);
-    }).then(  exec.exec(installCommand).catch(function(e) {
-      core.setFailed(e.message);
-  })))
+  })
+  const execRights = exec.exec('chmod +x ./install.sh').catch(function(e) {
+    core.setFailed(e.message);
+  });
+  const install = exec.exec(installCommand).catch(function(e) {
+    core.setFailed(e.message);
+  });
 
 } catch (error){
   core.setFailed(error.message);
