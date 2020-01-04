@@ -20,8 +20,6 @@ inputs:
 runs: 
   using: 'node12'
   main: 'index.js'
-  # curl -L https://omnitruck.chef.io/install.sh |
-  # sudo bash -s -- -c stable -P chefdk
 branding:
   icon: 'tool'
   color: 'red'
