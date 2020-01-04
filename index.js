@@ -4,6 +4,9 @@ const exec = require('@actions/exec')
 
 try {
   // get the variables we want
+  exec.exec('printenv').catch(function(e) {
+    core.setFailed(e.message)
+  })
   const channel =- core.getInput('channel');
   const project =- core.getInput('project');
   const version =- core.getInput('version');
@@ -15,8 +18,6 @@ try {
     console.log(`adding version pin to ${version}`)
     installCommand += ` -v ${version}`
   }
-  console.log(installCommand)
-  
   exec.exec(installCommand).catch(function(e) {
     core.setFailed(e.message)
   })
