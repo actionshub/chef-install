@@ -1,0 +1,25 @@
+name: 'Chef Install'
+author: 'Jason Field'
+description: 'Installs Chef on your linux build agent with ease'
+inputs:
+  channel:
+    description: 'Chef Channel to install, stable or current'
+    required: false
+    default: 'stable'
+  project:
+    description: 'which chef project to install, chef-workstation or chefdk'
+    required: false
+    default: 'chef-workstation'
+  project:
+    description: 'Exact version to install, overrides channel'
+    required: false
+  omnitruckUrl:
+    description: 'Omnitruck base url'
+    required: false
+    default: 'omnitruck.chef.io'
+runs: |
+  curl -L https://omnitruck.chef.io/install.sh |
+  sudo bash -s -- -c stable -P chefdk
+branding:
+  icon: 'tool'
+  color: 'red'
