@@ -24,7 +24,7 @@ try {
   }).then(
     exec.exec('sudo chmod +x /tmp/install.sh').catch(function(e) {
       core.setFailed(e.message)
-    }).then(
+    })).then(
     exec.exec(installCommand).catch(function(e) {
       core.setFailed(e.message)
     })
