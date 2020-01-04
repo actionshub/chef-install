@@ -24,9 +24,9 @@ try {
 
   exec.exec(downloadCommand).catch(function(e) {
     core.setFailed(e.message);
-  }).finally(exec.exec('chmod +x ./install.sh').catch(function(e) {
+  }).then(exec.exec('chmod +x ./install.sh').catch(function(e) {
       core.setFailed(e.message);
-    }).finally(  exec.exec(installCommand).catch(function(e) {
+    }).then(  exec.exec(installCommand).catch(function(e) {
       core.setFailed(e.message);
   })))
 
