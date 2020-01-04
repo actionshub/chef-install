@@ -1,13 +1,6 @@
 const core = require('@actions/core');
 const exec = require('@actions/exec')
 
-
-const runCommand = async function (command){
-  exec.exec(command).catch(function(e) {
-    core.setFailed(e.message);
-  })
-}
-
 async function main() {
   try {
     // Get the variables we care about
