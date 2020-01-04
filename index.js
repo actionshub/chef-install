@@ -10,7 +10,7 @@ try {
   const omnitruckUrl =- core.getInput('omnitruckUrl') || 'omnitruck.chef.io';
   console.log(`Installing ${project} on ${channel}`)
 
-  var installCommand = `curl -L https://${omnitruckUrl}/install.sh | sudo bash -s -- -c ${channel} -P ${project}`
+  var installCommand = `curl -L https://${omnitruckUrl}/install.sh | sudo /bin/sh -s -- -c ${channel} -P ${project}`
   if (version) {
     console.log(`adding version pin to ${version}`)
     installCommand += ` -v ${version}`
