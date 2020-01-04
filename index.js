@@ -19,13 +19,18 @@ try {
     console.log(`adding version pin to ${version}`)
     installCommand += ` -v ${version}`
   }
-  exec.exec(installCommand).catch(function(e) {
+  exec.exec(downloadCommand).catch(function(e) {
     core.setFailed(e.message)
-  })
+  }).then(
+    exec.exec('sudo chmod +x /tmp/install.sh').catch(function(e) {
+      core.setFailed(e.message)
+    }).then(
+    exec.exec(installCommand).catch(function(e) {
+      core.setFailed(e.message)
+    })
+  )
 
-  exec.exec(installCommand).catch(function(e) {
-    core.setFailed(e.message)
-  })
+
 
 } catch (error){
   core.setFailed(error.message)
