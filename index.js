@@ -39,8 +39,6 @@ async function main() {
       else {
         versionParam = ''
       }
-      // console.log("powershell -command '. { iwr -useb https://${omnitruckUrl}/install.ps1 } | iex; install ${channelParam} ${projectParam} ${versionParam}'")
-
       await exec.exec(`powershell.exe -command ". { iwr -useb https://${omnitruckUrl}/install.ps1 } | iex; install ${channelParam} ${projectParam} ${versionParam}"`)
     }
 

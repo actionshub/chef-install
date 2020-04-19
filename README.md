@@ -6,6 +6,8 @@ A Github Action to install Chef on a build agent
 
 Note you will need to accept the Chef license, you can find more information at <https://docs.chef.io/chef_license.html>
 
+There is support for Macos, Linux and Windows with this action
+
 ## Usage
 
 ```yaml
