@@ -18,9 +18,9 @@ inputs:
     required: false
     default: 'omnitruck.chef.io'
   windowsPath:
-    description: 'Path to the embedded folder created by the install. Windows Only'
+    description: 'Path to the root of the chef install. Windows Only'
     required: false
-    default: 'C:\opscode\chef-workstation\embedded\bin'
+    default: 'C:\opscode\chef-workstation\'
 runs:
   using: 'node12'
   main: 'index.js'
