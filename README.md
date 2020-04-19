@@ -24,7 +24,7 @@ jobs:
     - name: Check out code
       uses: actions/checkout@master
     - name: install chef
-      uses: actionshub/chef-installl@master
+      uses: actionshub/chef-install@master
  ```
 
 ## Envrionment Variables
