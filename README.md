@@ -1,10 +1,12 @@
 # chef-install
 
-[![CI State](https://github.com/actionshub/chef-install/workflows/release/badge.svg)](https://github.com/actionshub/chef-delivery)
+[![License](https://img.shields.io/badge/License-Apache%202.0-green.svg)](https://opensource.org/licenses/Apache-2.0)
 
 A Github Action to install Chef on a build agent
 
 Note you will need to accept the Chef license, you can find more information at <https://docs.chef.io/chef_license.html>
+
+There is support for Macos, Linux and Windows with this action
 
 ## Usage
 

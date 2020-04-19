@@ -1,23 +1,23 @@
-name: 'Chef Install'
+name: 'actionshub-chef-install'
 author: 'Jason Field'
 description: 'Installs Chef on your linux build agent with ease'
 inputs:
   channel:
     description: 'Chef Channel to install, stable or current'
-    required: true
+    required: false
     default: 'stable'
   project:
     description: 'which chef project to install, chef-workstation or chefdk'
-    required: true
+    required: false
     default: 'chef-workstation'
   version:
     description: 'version to install, default is latest'
     required: false
   omnitruckUrl:
     description: 'Omnitruck base url'
-    required: true
+    required: false
     default: 'omnitruck.chef.io'
-runs: 
+runs:
   using: 'node12'
   main: 'index.js'
 branding:
