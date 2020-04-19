@@ -31,6 +31,7 @@ async function main() {
     // We are on windows so assume powershell
     else
     {
+      const windowsPath = core.getInput('windowsPath');
       var channelParam = `-channel ${channel}`
       var projectParam = `-project ${project}`
       if (version) {
@@ -40,6 +41,7 @@ async function main() {
         versionParam = ''
       }
       await exec.exec(`powershell.exe -command ". { iwr -useb https://${omnitruckUrl}/install.ps1 } | iex; install ${channelParam} ${projectParam} ${versionParam}"`)
+      core.addPath(windowsPath)
     }
 
   } catch (error){
