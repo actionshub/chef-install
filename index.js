@@ -13,7 +13,7 @@ async function main() {
     // as Windows and Linux/MacOs run different installers
     // so we will check what OS and run appropriately
     // Create the args that the bash script will need
-    if (os != 'win32')
+    if (os.platform() != 'win32')
     {
       var channelParam = `-c ${channel}`
       var projectParam = `-P ${project}`
