@@ -42,7 +42,6 @@ async function main() {
       }
       await exec.exec(`powershell.exe -command ". { iwr -useb https://${omnitruckUrl}/install.ps1 } | iex; install ${channelParam} ${projectParam} ${versionParam}"`)
       core.addPath(`${windowsPath}\\bin`)
-      core.addPath(`${windowsPath}\\embedded\\bin`)
     }
 
   } catch (error){
