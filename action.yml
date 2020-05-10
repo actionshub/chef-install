@@ -17,6 +17,10 @@ inputs:
     description: 'Omnitruck base url'
     required: false
     default: 'omnitruck.chef.io'
+  windowsPath:
+    description: 'Path to the root of the chef install. Windows Only'
+    required: false
+    default: 'C:\opscode\chef-workstation\'
 runs:
   using: 'node12'
   main: 'index.js'
