@@ -1,5 +1,5 @@
 ---
-name: lint
+name: generic-linters
 
 on:
   pull_request:
@@ -25,9 +25,3 @@ jobs:
         uses: actionshub/markdownlint@feature/exclude
         with:
           filesToIgnoreRegex: "node_modules\\/.*"
-  all-lints:
-    needs: [mdl, yamllint]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code
-        uses: actions/checkout@master
