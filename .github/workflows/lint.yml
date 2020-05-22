@@ -22,4 +22,6 @@ jobs:
       - name: Check out code
         uses: actions/checkout@master
       - name: Run Markdown Lint
-        uses: actionshub/markdownlint@master
+        uses: actionshub/markdownlint@feature/exclude
+        with:
+          files-to-ignore-regex: "node_modules\\\/.*"
