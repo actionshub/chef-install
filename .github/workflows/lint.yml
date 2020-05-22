@@ -24,4 +24,4 @@ jobs:
       - name: Run Markdown Lint
         uses: actionshub/markdownlint@feature/exclude
         with:
-          files-to-ignore-regex: "node_modules\\/.*"
+          fileToIgnoreRegex: "node_modules\\/.*"
