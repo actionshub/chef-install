@@ -11,6 +11,8 @@ There is support for Macos, Linux and Windows with this action
 
 ## Usage
 
+Use the default settings to install [chef-workstaion](https://www.chef.sh/docs/chef-workstation/about/) from the stable channel
+
 ```yaml
 name: delivery
 
@@ -18,26 +20,40 @@ on: [push, pull_request]
 
 jobs:
   delivery:
-
     runs-on: ubuntu-latest
-
     steps:
     - name: Check out code
       uses: actions/checkout@master
     - name: install chef
       uses: actionshub/chef-install@master
- ```
+```
 
-## Envrionment Variables
+Install [inspec](https://www.inspec.io/) from the current channel
 
-We support the following Environment Variables
+```yaml
 
-|name| default| description|
-|--- |------- |----------- |
-|channel| stable | Chef Channel to install, stable or current |
-|project | chef-workstation | Which product to install,
-see <https://docs.chef.io/install_omnibus.html> for the list |
-|version | latest | version to install |
-|omnitruckUrl| omnitruck.chef.io | which Omnitruck to use, default is Chef Official|
+jobs:
+  delivery:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@master
+    - name: install chef
+      uses: actionshub/chef-install@master
+      with:
+        channel: current
+        project: inspec
+```
+
+## Parameters
+
+We support the following parameters
+
+| name         | default           | description                                                                            |
+| ------------ | ----------------- | -------------------------------------------------------------------------------------- |
+| channel      | stable            | Chef Channel to install, stable or current                                             |
+| project      | chef-workstation  | Which product to install, see <https://docs.chef.io/install_omnibus.html> for the list |
+| version      | latest            | version to install                                                                     |
+| omnitruckUrl | omnitruck.chef.io | which Omnitruck to use, default is Chef Official                                       |
 
 By Changing the omnitruck Url you can also install Cinc projects
