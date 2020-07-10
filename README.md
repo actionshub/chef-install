@@ -26,6 +26,10 @@ jobs:
       uses: actions/checkout@master
     - name: install chef
       uses: actionshub/chef-install@master
+    - name: Install Inspec
+      uses: actionshub/chef-install@1.1.0
+      with:
+        project: inspec
  ```
 
 ## Inputs
