@@ -28,9 +28,9 @@ jobs:
       uses: actionshub/chef-install@master
  ```
 
-## Envrionment Variables
+## Inputs
 
-We support the following Environment Variables
+We support the following Inputs
 
 |name| default| description|
 |--- |------- |----------- |
