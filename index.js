@@ -9,6 +9,8 @@ async function main() {
     const project = core.getInput('project') || 'chef-workstation';
     const version = core.getInput('version');
     const omnitruckUrl = core.getInput('omnitruckUrl') || 'omnitruck.chef.io';
+
+    core.warning("::warning ::Github Action: actionshub/chef-install has migrated to the main branch as default, the master branch will be removed")
     // This tool has intimate knowledge of the os
     // as Windows and Linux/MacOs run different installers
     // so we will check what OS and run appropriately
