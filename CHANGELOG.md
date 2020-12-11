@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Bump @actions/core from 1.2.0 to 1.2.6
+- Misc yaml and MDL fixes
+
 ## 2.0.0 - *2020-11-28*
 
 - Update documentation in README to point to the `main` branch
