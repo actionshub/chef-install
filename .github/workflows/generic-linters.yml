@@ -1,7 +1,7 @@
 ---
 name: generic-linters
 
-on:
+"on":
   pull_request:
   push:
     branches:
