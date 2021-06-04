@@ -11,7 +11,7 @@ There is support for Macos, Linux and Windows with this action
 
 ## Usage
 
-Use the default settings to install [chef-workstaion](https://www.chef.sh/docs/chef-workstation/about/) from the stable channel
+Use the default settings to install [chef-workstation](https://www.chef.sh/docs/chef-workstation/about/) from the stable channel
 
 ```yaml
 name: delivery
