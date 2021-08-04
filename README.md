@@ -25,7 +25,7 @@ jobs:
     - name: Check out code
       uses: actions/checkout@master
     - name: install chef
-      uses: actionshub/chef-install@master
+      uses: actionshub/chef-install@main
 ```
 
 Install [inspec](https://www.inspec.io/) from the current channel
@@ -39,7 +39,7 @@ jobs:
     - name: Check out code
       uses: actions/checkout@master
     - name: install chef
-      uses: actionshub/chef-install@master
+      uses: actionshub/chef-install@main
       with:
         channel: current
         project: inspec
