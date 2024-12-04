@@ -1,3 +1,4 @@
+---
 name: 'actionshub-chef-install'
 author: 'Jason Field'
 description: 'Installs Chef on your linux build agent with ease'
