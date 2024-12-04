@@ -10,7 +10,7 @@ async function main() {
     const version = core.getInput('version');
     const omnitruckUrl = core.getInput('omnitruckUrl') || 'omnitruck.chef.io';
     // This tool has intimate knowledge of the os
-    // as Windows and Linux/MacOs run different installers
+    // as Windows and Linux/MacOS run different installers
     // so we will check what OS and run appropriately
     // Create the args that the bash script will need
     if (os.platform() != 'win32')

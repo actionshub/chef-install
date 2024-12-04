@@ -1,8 +1,0 @@
-version: 2
-updates:
-  - package-ecosystem: 'npm'
-    vendor: true
-    directory: '/'
-    schedule:
-      interval: 'daily'
-      timezone: "12:20 HKT"
