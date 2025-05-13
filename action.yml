@@ -1,6 +1,6 @@
 name: 'actionshub-chef-install'
 author: 'Jason Field'
-description: 'Installs Chef on your linux build agent with ease'
+description: 'Installs Chef on your build agent with ease'
 inputs:
   channel:
     description: 'Chef Channel to install, stable or current'
@@ -21,9 +21,11 @@ inputs:
     description: 'Path to the root of the chef install. Windows Only'
     required: false
     default: 'C:\opscode\chef-workstation\'
+
 runs:
-  using: 'node16'
-  main: 'index.js'
+  using: 'node20'
+  main: dist/index.js
+
 branding:
   icon: 'download'
   color: 'red'

@@ -5,13 +5,16 @@
 
 A Github Action to install Chef on a build agent
 
-Note you will need to accept the Chef license, you can find more information at <https://docs.chef.io/chef_license.html>
+Note you will need to accept the Chef license, you can find more information at
+<https://docs.chef.io/chef_license.html>
 
 There is support for Macos, Linux and Windows with this action
 
 ## Usage
 
-Use the default settings to install [chef-workstation](https://www.chef.sh/docs/chef-workstation/about/) from the stable channel
+Use the default settings to install
+[chef-workstation](https://www.chef.sh/docs/chef-workstation/about/) from the
+stable channel
 
 ```yaml
 name: delivery
@@ -22,27 +25,26 @@ jobs:
   delivery:
     runs-on: ubuntu-latest
     steps:
-    - name: Check out code
-      uses: actions/checkout@master
-    - name: install chef
-      uses: actionshub/chef-install@main
+      - name: Check out code
+        uses: actions/checkout@master
+      - name: install chef
+        uses: actionshub/chef-install@main
 ```
 
 Install [inspec](https://www.inspec.io/) from the current channel
 
 ```yaml
-
 jobs:
   delivery:
     runs-on: ubuntu-latest
     steps:
-    - name: Check out code
-      uses: actions/checkout@master
-    - name: install chef
-      uses: actionshub/chef-install@main
-      with:
-        channel: current
-        project: inspec
+      - name: Check out code
+        uses: actions/checkout@master
+      - name: install chef
+        uses: actionshub/chef-install@main
+        with:
+          channel: current
+          project: inspec
 ```
 
 ## Parameters
