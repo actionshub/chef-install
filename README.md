@@ -11,7 +11,7 @@ There is support for Macos, Linux and Windows with this action
 
 ## Usage
 
-Use the default settings to install [chef-workstation](https://www.chef.sh/docs/chef-workstation/about/) from the stable channel
+Use the default settings to install [chef-workstation](https://docs.chef.io/workstation/) from the stable channel
 
 ```yaml
 name: delivery
@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Check out code
-      uses: actions/checkout@master
+      uses: actions/checkout@main
     - name: install chef
       uses: actionshub/chef-install@main
       with:
@@ -52,9 +52,9 @@ We support the following parameters
 | name         | default           | description                                                                            |
 | ------------ | ----------------- | -------------------------------------------------------------------------------------- |
 | channel      | stable            | Chef Channel to install, stable or current                                             |
-| project      | chef-workstation  | Which product to install, see <https://docs.chef.io/install_omnibus.html> for the list |
+| project      | chef-workstation  | Which product to install, see <https://docs.chef.io/chef_install_script/> for the list |
 | version      | latest            | version to install                                                                     |
-| omnitruckUrl | omnitruck.chef.io | which Omnitruck to use, default is Chef Official                                       |
+| chefDownloadUrl | chefdownload-community.chef.io | which Chef Download API to use, default is Chef Community                                       |
 | license | '' | license key, required if using https://docs.chef.io/download/commercial/ |
 
-By Changing the omnitruck Url you can also install Cinc projects
+By Changing the chefDownloadUrl you can also install Cinc projects
