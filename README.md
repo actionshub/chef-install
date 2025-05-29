@@ -55,5 +55,6 @@ We support the following parameters
 | project      | chef-workstation  | Which product to install, see <https://docs.chef.io/install_omnibus.html> for the list |
 | version      | latest            | version to install                                                                     |
 | omnitruckUrl | omnitruck.chef.io | which Omnitruck to use, default is Chef Official                                       |
+| license | '' | license key, required if using https://docs.chef.io/download/commercial/ |
 
 By Changing the omnitruck Url you can also install Cinc projects

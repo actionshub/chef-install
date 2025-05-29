@@ -16,6 +16,8 @@ inputs:
     required: false
   omnitruckUrl:
     description: 'Omnitruck base url'
+  license:
+    description: 'license key, required if using https://docs.chef.io/download/commercial/'
     required: false
     default: 'omnitruck.chef.io'
   windowsPath:
