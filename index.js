@@ -8,7 +8,11 @@ async function main() {
     const channel = core.getInput('channel') || 'stable';
     const project = core.getInput('project') || 'chef-workstation';
     const version = core.getInput('version');
-    const omnitruckUrl = core.getInput('omnitruckUrl') || 'omnitruck.chef.io';
+    const chefDownloadUrl = core.getInput('chefDownloadUrl') || 'chefdownload-community.chef.io';
+
+    const license = core.getInput('license');
+    const licenseParam = license ? `?license_id=${license}` : '';
+
     // This tool has intimate knowledge of the os
     // as Windows and Linux/MacOS run different installers
     // so we will check what OS and run appropriately
@@ -23,7 +27,7 @@ async function main() {
       else {
         versionParam = ''
       }
-      await exec.exec(`curl -L https://${omnitruckUrl}/install.sh -o chefDownload.sh`)
+      await exec.exec(`curl -L https://${chefDownloadUrl}/install.sh${licenseParam} -o chefDownload.sh`)
       await exec.exec(`sudo chmod +x chefDownload.sh`)
       await exec.exec(`sudo ./chefDownload.sh ${channelParam} ${projectParam} ${versionParam}`)
       await exec.exec(`rm -f chefDownload.sh`)
@@ -40,7 +44,7 @@ async function main() {
       else {
         versionParam = ''
       }
-      await exec.exec(`powershell.exe -command ". { iwr -useb https://${omnitruckUrl}/install.ps1 } | iex; install ${channelParam} ${projectParam} ${versionParam}"`)
+      await exec.exec(`powershell.exe -command ". { iwr -useb https://${chefDownloadUrl}/install.ps1${licenseParam} } | iex; install ${channelParam} ${projectParam} ${versionParam}"`)
       core.addPath(`${windowsPath}\\bin`)
     }
 
