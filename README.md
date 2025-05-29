@@ -55,6 +55,6 @@ We support the following parameters
 | project      | chef-workstation  | Which product to install, see <https://docs.chef.io/chef_install_script/> for the list |
 | version      | latest            | version to install                                                                     |
 | chefDownloadUrl | chefdownload-community.chef.io | which Chef Download API to use, default is Chef Community                                       |
-| license | '' | license key, required if using https://docs.chef.io/download/commercial/ |
+| license |  | license key, required if using https://docs.chef.io/download/commercial/ |
 
 By Changing the chefDownloadUrl you can also install Cinc projects
