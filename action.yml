@@ -12,7 +12,7 @@ inputs:
     required: false
     default: 'chef-workstation'
   version:
-    description: 'version to install, default is latest'
+    description: 'Version to install. Defaults to 21.6.497 for chef-workstation (last version with test-kitchen 2.x). Set to "latest" to get the newest version.'
     required: false
   omnitruckUrl:
     description: 'Omnitruck base url'
