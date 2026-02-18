@@ -23,8 +23,48 @@ inputs:
     required: false
     default: 'C:\opscode\chef-workstation\'
 runs:
-  using: 'node20'
-  main: 'index.js'
+  using: composite
+  steps:
+    - name: Install Chef (Linux/macOS)
+      if: runner.os != 'Windows'
+      shell: bash
+      env:
+        CHANNEL: ${{ inputs.channel }}
+        PROJECT: ${{ inputs.project }}
+        VERSION: ${{ inputs.version }}
+        OMNITRUCK_URL: ${{ inputs.omnitruckUrl }}
+      run: |
+        set -o pipefail
+        if [ -z "$VERSION" ] && [ "$PROJECT" = "chef-workstation" ]; then
+          VERSION="21.6.497"
+        fi
+        VERSION_FLAG=""
+        [ -n "$VERSION" ] && VERSION_FLAG="-v ${VERSION}"
+        curl -fsSL "https://${OMNITRUCK_URL}/install.sh" \
+          | sudo bash -s -- -c "${CHANNEL}" -P "${PROJECT}" ${VERSION_FLAG}
+
+    - name: Install Chef (Windows)
+      if: runner.os == 'Windows'
+      shell: pwsh
+      env:
+        CHANNEL: ${{ inputs.channel }}
+        PROJECT: ${{ inputs.project }}
+        VERSION: ${{ inputs.version }}
+        OMNITRUCK_URL: ${{ inputs.omnitruckUrl }}
+      run: |
+        if (-not $env:VERSION -and $env:PROJECT -eq "chef-workstation") {
+          $env:VERSION = "21.6.497"
+        }
+        $vFlag = if ($env:VERSION) { "-version $env:VERSION" } else { "" }
+        . { iwr -useb "https://$env:OMNITRUCK_URL/install.ps1" } | iex
+        install -channel $env:CHANNEL -project $env:PROJECT $vFlag
+
+    - name: Add Chef to PATH (Windows)
+      if: runner.os == 'Windows'
+      shell: bash
+      env:
+        WINDOWS_PATH: ${{ inputs.windowsPath }}
+      run: echo "${WINDOWS_PATH}bin" >> "$GITHUB_PATH"
 branding:
   icon: 'download'
   color: 'red'
