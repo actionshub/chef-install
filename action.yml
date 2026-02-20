@@ -52,12 +52,17 @@ runs:
         VERSION: ${{ inputs.version }}
         OMNITRUCK_URL: ${{ inputs.omnitruckUrl }}
       run: |
-        if (-not $env:VERSION -and $env:PROJECT -eq "chef-workstation") {
-          $env:VERSION = "latest"
+        $params = @{
+          channel = $env:CHANNEL
+          project = $env:PROJECT
         }
-        $vFlag = if ($env:VERSION) { "-version $env:VERSION" } else { "" }
+        if (-not $env:VERSION -and $env:PROJECT -eq "chef-workstation") {
+          $params["version"] = "latest"
+        } elseif ($env:VERSION) {
+          $params["version"] = $env:VERSION
+        }
         . { iwr -useb "https://$env:OMNITRUCK_URL/install.ps1" } | iex
-        install -channel $env:CHANNEL -project $env:PROJECT $vFlag
+        install @params
 
     - name: Add Chef to PATH (Windows)
       if: runner.os == 'Windows'
