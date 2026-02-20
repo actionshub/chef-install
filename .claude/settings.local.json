@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:docs.chef.io)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:omnitruck.chef.io)",
+      "Bash(npm audit:*)",
+      "Bash(npm view:*)",
+      "Bash(npm install:*)",
+      "Bash(git push:*)",
+      "Bash(git -C /Users/damacus/repos/actionshub/chef-install status)",
+      "Bash(git -C /Users/damacus/repos/actionshub/chef-install push -u origin refactor/composite-action)",
+      "Bash(gh pr create:*)",
+      "Bash(gh pr diff:*)",
+      "Bash(gh api:*)",
+      "Bash(python3:*)"
+    ]
+  }
+}

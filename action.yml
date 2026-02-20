@@ -12,7 +12,7 @@ inputs:
     required: false
     default: 'chef-workstation'
   version:
-    description: 'Version to install. Defaults to 21.6.497 for chef-workstation (last version with test-kitchen 2.x). Set to "latest" to get the newest version.'
+    description: 'Version to install. Defaults to latest for chef-workstation'
     required: false
   omnitruckUrl:
     description: 'Omnitruck base url'
@@ -36,7 +36,7 @@ runs:
       run: |
         set -o pipefail
         if [ -z "$VERSION" ] && [ "$PROJECT" = "chef-workstation" ]; then
-          VERSION="21.6.497"
+          VERSION="latest"
         fi
         VERSION_FLAG=""
         [ -n "$VERSION" ] && VERSION_FLAG="-v ${VERSION}"
@@ -53,7 +53,7 @@ runs:
         OMNITRUCK_URL: ${{ inputs.omnitruckUrl }}
       run: |
         if (-not $env:VERSION -and $env:PROJECT -eq "chef-workstation") {
-          $env:VERSION = "21.6.497"
+          $env:VERSION = "latest"
         }
         $vFlag = if ($env:VERSION) { "-version $env:VERSION" } else { "" }
         . { iwr -useb "https://$env:OMNITRUCK_URL/install.ps1" } | iex
