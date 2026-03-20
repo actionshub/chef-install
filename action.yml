@@ -1,25 +1,32 @@
 ---
 name: 'actionshub-chef-install'
 author: 'Jason Field'
-description: 'Installs Chef on your linux build agent with ease'
+description: 'Installs Chef or Cinc on your build agent with ease'
 inputs:
   channel:
     description: 'Chef Channel to install, stable or current'
     required: false
     default: 'stable'
   project:
-    description: 'which chef project to install, chef-workstation or chefdk'
+    description: 'Which Chef or Cinc project to install'
     required: false
     default: 'chef-workstation'
   version:
     description: 'Version to install. Defaults to latest for chef-workstation'
     required: false
-  omnitruckUrl:
-    description: 'Omnitruck base url'
+  chefDownloadUrl:
+    description: 'Chef download base url'
     required: false
-    default: 'omnitruck.chef.io'
+    default: 'chefdownload-community.chef.io'
+  license:
+    description: 'Chef Downloads license ID. Required for Chef Community/Commercial downloads; not used for Cinc.'
+    required: false
+  omnitruckUrl:
+    description: 'Deprecated: Omnitruck base url. Use for Cinc or other omnitruck-compatible endpoints.'
+    required: false
+    default: ''
   windowsPath:
-    description: 'Path to the root of the chef install. Windows Only'
+    description: 'Path to the root of the install on Windows. Override this for non-default products such as Cinc.'
     required: false
     default: 'C:\opscode\chef-workstation\'
 runs:
@@ -32,15 +39,32 @@ runs:
         CHANNEL: ${{ inputs.channel }}
         PROJECT: ${{ inputs.project }}
         VERSION: ${{ inputs.version }}
+        CHEF_DOWNLOAD_URL: ${{ inputs.chefDownloadUrl }}
+        LICENSE: ${{ inputs.license }}
         OMNITRUCK_URL: ${{ inputs.omnitruckUrl }}
       run: |
-        set -o pipefail
+        set -euo pipefail
         if [ -z "$VERSION" ] && [ "$PROJECT" = "chef-workstation" ]; then
           VERSION="latest"
         fi
         VERSION_FLAG=""
         [ -n "$VERSION" ] && VERSION_FLAG="-v ${VERSION}"
-        curl -fsSL "https://${OMNITRUCK_URL}/install.sh" \
+
+        if [ -n "$OMNITRUCK_URL" ]; then
+          SCRIPT_URL="https://${OMNITRUCK_URL}/install.sh"
+        else
+          if [ -z "$LICENSE" ]; then
+            echo "The 'license' input is required when using Chef Community/Commercial downloads." >&2
+            exit 1
+          fi
+          if [ "$CHEF_DOWNLOAD_URL" = "chefdownload-community.chef.io" ] && [ "$CHANNEL" != "stable" ]; then
+            echo "The Chef Community API only supports the stable channel. Use chefdownload-commercial.chef.io or an omnitruck endpoint for current." >&2
+            exit 1
+          fi
+          SCRIPT_URL="https://${CHEF_DOWNLOAD_URL}/install.sh?license_id=${LICENSE}"
+        fi
+
+        curl -fsSL "$SCRIPT_URL" \
           | sudo bash -s -- -c "${CHANNEL}" -P "${PROJECT}" ${VERSION_FLAG}
 
     - name: Install Chef (Windows)
@@ -50,6 +74,8 @@ runs:
         CHANNEL: ${{ inputs.channel }}
         PROJECT: ${{ inputs.project }}
         VERSION: ${{ inputs.version }}
+        CHEF_DOWNLOAD_URL: ${{ inputs.chefDownloadUrl }}
+        LICENSE: ${{ inputs.license }}
         OMNITRUCK_URL: ${{ inputs.omnitruckUrl }}
       run: |
         $params = @{
@@ -61,7 +87,20 @@ runs:
         } elseif ($env:VERSION) {
           $params["version"] = $env:VERSION
         }
-        . { iwr -useb "https://$env:OMNITRUCK_URL/install.ps1" } | iex
+
+        if ($env:OMNITRUCK_URL) {
+          $scriptUrl = "https://$env:OMNITRUCK_URL/install.ps1"
+        } else {
+          if (-not $env:LICENSE) {
+            throw "The 'license' input is required when using Chef Community/Commercial downloads."
+          }
+          if ($env:CHEF_DOWNLOAD_URL -eq "chefdownload-community.chef.io" -and $env:CHANNEL -ne "stable") {
+            throw "The Chef Community API only supports the stable channel. Use chefdownload-commercial.chef.io or an omnitruck endpoint for current."
+          }
+          $scriptUrl = "https://$env:CHEF_DOWNLOAD_URL/install.ps1?license_id=$($env:LICENSE)"
+        }
+
+        . { iwr -useb $scriptUrl } | iex
         install @params
 
     - name: Add Chef to PATH (Windows)
