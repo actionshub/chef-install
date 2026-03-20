@@ -45,6 +45,7 @@ runs:
       run: |
         set -euo pipefail
         INSTALL_PROJECT="$PROJECT"
+        SCRIPT_SUFFIX="install.sh"
         if [ -z "$LICENSE" ]; then
           case "$PROJECT" in
             chef-workstation)
@@ -70,13 +71,58 @@ runs:
             echo "The Chef Community API only supports the stable channel. Use chefdownload-commercial.chef.io or an omnitruck endpoint for current." >&2
             exit 1
           fi
-          SCRIPT_URL="https://${CHEF_DOWNLOAD_URL}/install.sh?license_id=${LICENSE}"
+          SCRIPT_URL="https://${CHEF_DOWNLOAD_URL}/${SCRIPT_SUFFIX}?license_id=${LICENSE}"
         else
-          SCRIPT_URL="https://${OMNITRUCK_URL}/install.sh"
+          if [ -z "$OMNITRUCK_URL" ]; then
+            echo "No install source configured. Set 'license' for Chef downloads or 'omnitruckUrl' for omnitruck-compatible installs." >&2
+            exit 1
+          fi
+          SCRIPT_URL="https://${OMNITRUCK_URL}/${SCRIPT_SUFFIX}"
         fi
 
-        curl -fsSL "$SCRIPT_URL" \
-          | sudo bash -s -- -c "${CHANNEL}" -P "${INSTALL_PROJECT}" ${VERSION_FLAG}
+        TEMP_SCRIPT="$(mktemp)"
+        TEMP_HEADERS="$(mktemp)"
+        cleanup() {
+          rm -f "$TEMP_SCRIPT" "$TEMP_HEADERS"
+        }
+        trap cleanup EXIT
+
+        CURL_INFO="$(curl --silent --show-error --location \
+          --dump-header "$TEMP_HEADERS" \
+          --output "$TEMP_SCRIPT" \
+          --write-out '%{http_code} %{url_effective}' \
+          "$SCRIPT_URL")"
+        HTTP_STATUS="${CURL_INFO%% *}"
+        EFFECTIVE_URL="${CURL_INFO#* }"
+
+        if [ "$HTTP_STATUS" != "200" ]; then
+          echo "Failed to download installer from $SCRIPT_URL (HTTP $HTTP_STATUS)." >&2
+          if [ -n "$LICENSE" ]; then
+            echo "Check that the supplied Chef license_id is valid for ${CHEF_DOWNLOAD_URL}." >&2
+          fi
+          exit 1
+        fi
+
+        case "$EFFECTIVE_URL" in
+          *"/${SCRIPT_SUFFIX}"* ) ;;
+          *)
+            echo "Installer download redirected to an unexpected URL: $EFFECTIVE_URL" >&2
+            if [ -n "$LICENSE" ]; then
+              echo "This usually means the supplied Chef license_id is missing or invalid." >&2
+            fi
+            exit 1
+            ;;
+        esac
+
+        if grep -Eiq '^[[:space:]]*<(!DOCTYPE|html)\b' "$TEMP_SCRIPT"; then
+          echo "Installer download returned HTML instead of a shell script: $EFFECTIVE_URL" >&2
+          if [ -n "$LICENSE" ]; then
+            echo "This usually means the supplied Chef license_id is missing or invalid." >&2
+          fi
+          exit 1
+        fi
+
+        sudo bash "$TEMP_SCRIPT" -c "${CHANNEL}" -P "${INSTALL_PROJECT}" ${VERSION_FLAG}
 
     - name: Install Chef (Windows)
       if: runner.os == 'Windows'
@@ -94,6 +140,7 @@ runs:
           channel = $env:CHANNEL
         }
         $installProject = $env:PROJECT
+        $scriptSuffix = "install.ps1"
         if (-not $env:LICENSE) {
           switch ($env:PROJECT) {
             "chef-workstation" { $installProject = "cinc-workstation" }
@@ -113,12 +160,59 @@ runs:
           if ($env:CHEF_DOWNLOAD_URL -eq "chefdownload-community.chef.io" -and $env:CHANNEL -ne "stable") {
             throw "The Chef Community API only supports the stable channel. Use chefdownload-commercial.chef.io or an omnitruck endpoint for current."
           }
-          $scriptUrl = "https://$env:CHEF_DOWNLOAD_URL/install.ps1?license_id=$($env:LICENSE)"
+          $scriptUrl = "https://$env:CHEF_DOWNLOAD_URL/$scriptSuffix?license_id=$($env:LICENSE)"
         } else {
-          $scriptUrl = "https://$env:OMNITRUCK_URL/install.ps1"
+          if (-not $env:OMNITRUCK_URL) {
+            throw "No install source configured. Set 'license' for Chef downloads or 'omnitruckUrl' for omnitruck-compatible installs."
+          }
+          $scriptUrl = "https://$env:OMNITRUCK_URL/$scriptSuffix"
         }
 
-        . { iwr -useb $scriptUrl } | iex
+        $scriptPath = Join-Path $env:RUNNER_TEMP "chef-install-script.ps1"
+        try {
+          $response = Invoke-WebRequest -UseBasicParsing -Uri $scriptUrl -MaximumRedirection 5 -OutFile $scriptPath -PassThru -ErrorAction Stop
+        } catch {
+          $statusCode = $null
+          if ($_.Exception.Response -and $_.Exception.Response.StatusCode) {
+            $statusCode = $_.Exception.Response.StatusCode.value__
+          }
+          if ($statusCode) {
+            $message = "Failed to download installer from $scriptUrl (HTTP $statusCode)."
+          } else {
+            $message = "Failed to download installer from $scriptUrl."
+          }
+          if ($env:LICENSE) {
+            $message += " Check that the supplied Chef license_id is valid for $($env:CHEF_DOWNLOAD_URL)."
+          }
+          throw $message
+        }
+
+        $effectiveUrl = $response.BaseResponse.ResponseUri.AbsoluteUri
+        if ($response.StatusCode -ne 200) {
+          $message = "Failed to download installer from $scriptUrl (HTTP $($response.StatusCode))."
+          if ($env:LICENSE) {
+            $message += " Check that the supplied Chef license_id is valid for $($env:CHEF_DOWNLOAD_URL)."
+          }
+          throw $message
+        }
+        if ($effectiveUrl -notlike "*/$scriptSuffix*") {
+          $message = "Installer download redirected to an unexpected URL: $effectiveUrl"
+          if ($env:LICENSE) {
+            $message += ". This usually means the supplied Chef license_id is missing or invalid."
+          }
+          throw $message
+        }
+
+        $scriptContent = Get-Content -Path $scriptPath -Raw
+        if ($scriptContent -match '^\s*<(?:!DOCTYPE|html)\b') {
+          $message = "Installer download returned HTML instead of a PowerShell script: $effectiveUrl"
+          if ($env:LICENSE) {
+            $message += ". This usually means the supplied Chef license_id is missing or invalid."
+          }
+          throw $message
+        }
+
+        . $scriptPath
         install @params
         if ($env:WINDOWS_PATH) {
           $installRoot = $env:WINDOWS_PATH
