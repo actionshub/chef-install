@@ -10,9 +10,9 @@ inputs:
   project:
     description: 'Which Chef or Cinc project to install'
     required: false
-    default: 'chef-workstation'
+    default: 'cinc-workstation'
   version:
-    description: 'Version to install. Defaults to latest for chef-workstation'
+    description: 'Version to install. Defaults to latest for workstation installs'
     required: false
   chefDownloadUrl:
     description: 'Chef download base url'
@@ -24,11 +24,11 @@ inputs:
   omnitruckUrl:
     description: 'Deprecated: Omnitruck base url. Use for Cinc or other omnitruck-compatible endpoints.'
     required: false
-    default: ''
+    default: 'omnitruck.cinc.sh'
   windowsPath:
     description: 'Path to the root of the install on Windows. Override this for non-default products such as Cinc.'
     required: false
-    default: 'C:\opscode\chef-workstation\'
+    default: ''
 runs:
   using: composite
   steps:
@@ -44,28 +44,39 @@ runs:
         OMNITRUCK_URL: ${{ inputs.omnitruckUrl }}
       run: |
         set -euo pipefail
-        if [ -z "$VERSION" ] && [ "$PROJECT" = "chef-workstation" ]; then
+        INSTALL_PROJECT="$PROJECT"
+        if [ -z "$LICENSE" ]; then
+          case "$PROJECT" in
+            chef-workstation)
+              INSTALL_PROJECT="cinc-workstation"
+              ;;
+            inspec)
+              INSTALL_PROJECT="cinc-auditor"
+              ;;
+            chef|chef-client)
+              INSTALL_PROJECT="cinc"
+              ;;
+          esac
+        fi
+
+        if [ -z "$VERSION" ] && { [ "$INSTALL_PROJECT" = "chef-workstation" ] || [ "$INSTALL_PROJECT" = "cinc-workstation" ]; }; then
           VERSION="latest"
         fi
         VERSION_FLAG=""
         [ -n "$VERSION" ] && VERSION_FLAG="-v ${VERSION}"
 
-        if [ -n "$OMNITRUCK_URL" ]; then
-          SCRIPT_URL="https://${OMNITRUCK_URL}/install.sh"
-        else
-          if [ -z "$LICENSE" ]; then
-            echo "The 'license' input is required when using Chef Community/Commercial downloads." >&2
-            exit 1
-          fi
+        if [ -n "$LICENSE" ]; then
           if [ "$CHEF_DOWNLOAD_URL" = "chefdownload-community.chef.io" ] && [ "$CHANNEL" != "stable" ]; then
             echo "The Chef Community API only supports the stable channel. Use chefdownload-commercial.chef.io or an omnitruck endpoint for current." >&2
             exit 1
           fi
           SCRIPT_URL="https://${CHEF_DOWNLOAD_URL}/install.sh?license_id=${LICENSE}"
+        else
+          SCRIPT_URL="https://${OMNITRUCK_URL}/install.sh"
         fi
 
         curl -fsSL "$SCRIPT_URL" \
-          | sudo bash -s -- -c "${CHANNEL}" -P "${PROJECT}" ${VERSION_FLAG}
+          | sudo bash -s -- -c "${CHANNEL}" -P "${INSTALL_PROJECT}" ${VERSION_FLAG}
 
     - name: Install Chef (Windows)
       if: runner.os == 'Windows'
@@ -77,38 +88,44 @@ runs:
         CHEF_DOWNLOAD_URL: ${{ inputs.chefDownloadUrl }}
         LICENSE: ${{ inputs.license }}
         OMNITRUCK_URL: ${{ inputs.omnitruckUrl }}
+        WINDOWS_PATH: ${{ inputs.windowsPath }}
       run: |
         $params = @{
           channel = $env:CHANNEL
-          project = $env:PROJECT
         }
-        if (-not $env:VERSION -and $env:PROJECT -eq "chef-workstation") {
+        $installProject = $env:PROJECT
+        if (-not $env:LICENSE) {
+          switch ($env:PROJECT) {
+            "chef-workstation" { $installProject = "cinc-workstation" }
+            "inspec" { $installProject = "cinc-auditor" }
+            { $_ -in @("chef", "chef-client") } { $installProject = "cinc" }
+          }
+        }
+        $params["project"] = $installProject
+
+        if (-not $env:VERSION -and $installProject -in @("chef-workstation", "cinc-workstation")) {
           $params["version"] = "latest"
         } elseif ($env:VERSION) {
           $params["version"] = $env:VERSION
         }
 
-        if ($env:OMNITRUCK_URL) {
-          $scriptUrl = "https://$env:OMNITRUCK_URL/install.ps1"
-        } else {
-          if (-not $env:LICENSE) {
-            throw "The 'license' input is required when using Chef Community/Commercial downloads."
-          }
+        if ($env:LICENSE) {
           if ($env:CHEF_DOWNLOAD_URL -eq "chefdownload-community.chef.io" -and $env:CHANNEL -ne "stable") {
             throw "The Chef Community API only supports the stable channel. Use chefdownload-commercial.chef.io or an omnitruck endpoint for current."
           }
           $scriptUrl = "https://$env:CHEF_DOWNLOAD_URL/install.ps1?license_id=$($env:LICENSE)"
+        } else {
+          $scriptUrl = "https://$env:OMNITRUCK_URL/install.ps1"
         }
 
         . { iwr -useb $scriptUrl } | iex
         install @params
-
-    - name: Add Chef to PATH (Windows)
-      if: runner.os == 'Windows'
-      shell: bash
-      env:
-        WINDOWS_PATH: ${{ inputs.windowsPath }}
-      run: echo "${WINDOWS_PATH}bin" >> "$GITHUB_PATH"
+        if ($env:WINDOWS_PATH) {
+          $installRoot = $env:WINDOWS_PATH
+        } else {
+          $installRoot = "C:\opscode\$installProject\"
+        }
+        "$($installRoot)bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 branding:
   icon: 'download'
   color: 'red'
