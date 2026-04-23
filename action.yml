@@ -14,8 +14,15 @@ inputs:
   version:
     description: 'Version to install. Defaults to latest for chef-workstation'
     required: false
+  chefDownloadUrl:
+    description: 'Chef download base url. Used when license is provided.'
+    required: false
+    default: 'chefdownload-community.chef.io'
+  license:
+    description: 'Chef license ID. Required for Chef Community/Commercial downloads.'
+    required: false
   omnitruckUrl:
-    description: 'Omnitruck base url'
+    description: 'Omnitruck base url. Used when no license is provided.'
     required: false
     default: 'omnitruck.chef.io'
   windowsPath:
@@ -32,6 +39,8 @@ runs:
         CHANNEL: ${{ inputs.channel }}
         PROJECT: ${{ inputs.project }}
         VERSION: ${{ inputs.version }}
+        CHEF_DOWNLOAD_URL: ${{ inputs.chefDownloadUrl }}
+        LICENSE: ${{ inputs.license }}
         OMNITRUCK_URL: ${{ inputs.omnitruckUrl }}
       run: |
         set -o pipefail
@@ -40,7 +49,12 @@ runs:
         fi
         VERSION_FLAG=""
         [ -n "$VERSION" ] && VERSION_FLAG="-v ${VERSION}"
-        curl -fsSL "https://${OMNITRUCK_URL}/install.sh" \
+        if [ -n "$LICENSE" ]; then
+          SCRIPT_URL="https://${CHEF_DOWNLOAD_URL}/install.sh?license_id=${LICENSE}"
+        else
+          SCRIPT_URL="https://${OMNITRUCK_URL}/install.sh"
+        fi
+        curl -fsSL "$SCRIPT_URL" \
           | sudo bash -s -- -c "${CHANNEL}" -P "${PROJECT}" ${VERSION_FLAG}
 
     - name: Install Chef (Windows)
@@ -50,13 +64,20 @@ runs:
         CHANNEL: ${{ inputs.channel }}
         PROJECT: ${{ inputs.project }}
         VERSION: ${{ inputs.version }}
+        CHEF_DOWNLOAD_URL: ${{ inputs.chefDownloadUrl }}
+        LICENSE: ${{ inputs.license }}
         OMNITRUCK_URL: ${{ inputs.omnitruckUrl }}
       run: |
         if (-not $env:VERSION -and $env:PROJECT -eq "chef-workstation") {
           $env:VERSION = "latest"
         }
         $vFlag = if ($env:VERSION) { "-version $env:VERSION" } else { "" }
-        . { iwr -useb "https://$env:OMNITRUCK_URL/install.ps1" } | iex
+        if ($env:LICENSE) {
+          $scriptUrl = "https://$env:CHEF_DOWNLOAD_URL/install.ps1?license_id=$($env:LICENSE)"
+        } else {
+          $scriptUrl = "https://$env:OMNITRUCK_URL/install.ps1"
+        }
+        . { iwr -useb $scriptUrl } | iex
         install -channel $env:CHANNEL -project $env:PROJECT $vFlag
 
     - name: Add Chef to PATH (Windows)

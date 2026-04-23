@@ -11,7 +11,7 @@ There is support for Macos, Linux and Windows with this action
 
 ## Usage
 
-Use the default settings to install [chef-workstation](https://www.chef.sh/docs/chef-workstation/about/) from the stable channel
+Use the default settings to install [chef-workstation](https://docs.chef.io/workstation/) from the stable channel via Omnitruck
 
 ```yaml
 name: delivery
@@ -28,7 +28,7 @@ jobs:
       uses: actionshub/chef-install@main
 ```
 
-Install [inspec](https://www.inspec.io/) from the current channel
+Install [chef-workstation](https://docs.chef.io/workstation/) from the Chef Community download API
 
 ```yaml
 
@@ -37,10 +37,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Check out code
-      uses: actions/checkout@master
+      uses: actions/checkout@main
     - name: install chef
       uses: actionshub/chef-install@main
       with:
+        license: ${{ secrets.CHEF_LICENSE_ID }}
+        project: chef-workstation
+```
+
+Install [inspec](https://www.inspec.io/) from the Chef Commercial API on the current channel
+
+```yaml
+
+jobs:
+  delivery:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@main
+    - name: install chef
+      uses: actionshub/chef-install@main
+      with:
+        license: ${{ secrets.CHEF_LICENSE_ID }}
+        chefDownloadUrl: chefdownload-commercial.chef.io
         channel: current
         project: inspec
 ```
@@ -73,11 +92,16 @@ To pin to a specific version:
 
 We support the following parameters
 
-| name         | default                            | description                                                                            |
-| ------------ | ---------------------------------- | -------------------------------------------------------------------------------------- |
-| channel      | stable                             | Chef Channel to install, stable or current                                             |
-| project      | chef-workstation                   | Which product to install, see <https://docs.chef.io/install_omnibus.html> for the list |
-| version      | 21.6.497 (for chef-workstation)    | Version to install. Set to `latest` for the newest release.                            |
-| omnitruckUrl | omnitruck.chef.io                  | which Omnitruck to use, default is Chef Official                                       |
+| name            | default                          | description                                                                            |
+| --------------- | -------------------------------- | -------------------------------------------------------------------------------------- |
+| channel         | stable                           | Chef channel to install, stable or current                                             |
+| project         | chef-workstation                 | Which product to install, see <https://docs.chef.io/chef_install_script/> for the list |
+| version         | 21.6.497 (for chef-workstation)  | Version to install. Set to `latest` for the newest release.                            |
+| chefDownloadUrl | chefdownload-community.chef.io   | Chef download API host. Used when `license` is provided.                               |
+| license         |                                  | Chef license ID. Required for Chef Community/Commercial downloads.                     |
+| omnitruckUrl    | omnitruck.chef.io                | Omnitruck base url. Used when no `license` is provided.                                |
 
-By Changing the omnitruck Url you can also install Cinc projects
+When `license` is set, the action downloads the installer from `chefDownloadUrl`. Without a
+`license`, the action falls back to `omnitruckUrl` for backwards compatibility.
+
+By changing the `omnitruckUrl` you can also install Cinc projects (e.g. `omnitruck.cinc.sh`).
