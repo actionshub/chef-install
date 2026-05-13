@@ -5,13 +5,16 @@
 
 A Github Action to install Chef on a build agent
 
-Note you will need to accept the Chef license, you can find more information at <https://docs.chef.io/chef_license.html>
+By default this action installs Cinc from `omnitruck.cinc.sh`. Chef installs use the
+[Chef Community download API](https://docs.chef.io/download/community/) or the Chef commercial API
+when you provide a `license_id`.
 
 There is support for Macos, Linux and Windows with this action
 
 ## Usage
 
-Use the default settings to install [chef-workstation](https://www.chef.sh/docs/chef-workstation/about/) from the stable channel
+Use the default settings to install [Cinc Workstation](https://cinc.sh/start/workstation/) from
+the Cinc omnibus endpoint
 
 ```yaml
 name: delivery
@@ -24,11 +27,11 @@ jobs:
     steps:
     - name: Check out code
       uses: actions/checkout@master
-    - name: install chef
+    - name: install cinc
       uses: actionshub/chef-install@main
 ```
 
-Install [inspec](https://www.inspec.io/) from the current channel
+Install [Chef Workstation](https://docs.chef.io/workstation/) from the Chef Community API
 
 ```yaml
 
@@ -41,15 +44,51 @@ jobs:
     - name: install chef
       uses: actionshub/chef-install@main
       with:
+        license: ${{ secrets.CHEF_LICENSE_ID }}
+        project: chef-workstation
+```
+
+Install [inspec](https://www.inspec.io/) from the commercial API on the current channel
+
+```yaml
+
+jobs:
+  delivery:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@master
+    - name: install chef
+      uses: actionshub/chef-install@main
+      with:
+        license: ${{ secrets.CHEF_LICENSE_ID }}
+        chefDownloadUrl: chefdownload-commercial.chef.io
         channel: current
         project: inspec
 ```
 
-### Version pinning
+Install Cinc Workstation explicitly:
 
-By default, `chef-workstation` installs version **21.6.497** — the last release that ships
-test-kitchen 2.x. Versions 21.7.524 and later bundle test-kitchen 3.x which contains
-breaking changes.
+```yaml
+
+jobs:
+  delivery:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@master
+    - name: install cinc
+      uses: actionshub/chef-install@main
+      with:
+        project: cinc-workstation
+```
+
+The installed Cinc packages are Chef-compatible. If you need direct package downloads instead of
+the install script, Cinc also publishes plain packages at <https://cinc.sh/download/>.
+
+### Version selection
+
+By default, `cinc-workstation` installs the latest available version.
 
 To opt in to the latest release:
 
@@ -73,11 +112,25 @@ To pin to a specific version:
 
 We support the following parameters
 
-| name         | default                            | description                                                                            |
-| ------------ | ---------------------------------- | -------------------------------------------------------------------------------------- |
-| channel      | stable                             | Chef Channel to install, stable or current                                             |
-| project      | chef-workstation                   | Which product to install, see <https://docs.chef.io/install_omnibus.html> for the list |
-| version      | 21.6.497 (for chef-workstation)    | Version to install. Set to `latest` for the newest release.                            |
-| omnitruckUrl | omnitruck.chef.io                  | which Omnitruck to use, default is Chef Official                                       |
+| name            | default                      | description                                                                                         |
+| --------------- | ---------------------------- | --------------------------------------------------------------------------------------------------- |
+| channel         | stable                       | Chef channel to install, stable or current                                                          |
+| project         | cinc-workstation             | Which product to install, see <https://docs.chef.io/chef_install_script/> for Chef project names and <https://cinc.sh/start/> for Cinc products |
+| version         | latest (for workstation installs) | Version to install. Set to `latest` for the newest release.                                    |
+| chefDownloadUrl | chefdownload-community.chef.io | Chef download API host. Defaults to the Chef Community API.                                        |
+| license         |                              | Chef Downloads license ID. Required for Chef Community/Commercial downloads. Not used for Cinc.    |
+| omnitruckUrl    | omnitruck.cinc.sh            | Deprecated compatibility input for omnitruck hosts. Defaults to the Cinc omnibus endpoint.         |
+| windowsPath     | auto                         | Root install path used for the Windows PATH update step. Override this for products installed elsewhere. |
 
-By Changing the omnitruck Url you can also install Cinc projects
+When `license` is set, the action uses `chefDownloadUrl`. Without a `license`, the action uses
+`omnitruckUrl`, which defaults to Cinc.
+
+When using the default Chef Community API, `channel` must remain `stable`. Use
+`chefdownload-commercial.chef.io` if you need the `current` channel for Chef packages.
+
+For compatibility, Chef product names are mapped to their Cinc equivalents when installing from
+the default Cinc omnitruck endpoint:
+
+- `chef-workstation` becomes `cinc-workstation`
+- `inspec` becomes `cinc-auditor`
+- `chef` and `chef-client` become `cinc`
