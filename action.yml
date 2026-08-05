@@ -187,7 +187,7 @@ runs:
           throw $message
         }
 
-        $effectiveUrl = $response.BaseResponse.ResponseUri.AbsoluteUri
+        $effectiveUrl = $response.BaseResponse.RequestMessage.RequestUri.AbsoluteUri
         if ($response.StatusCode -ne 200) {
           $message = "Failed to download installer from $scriptUrl (HTTP $($response.StatusCode))."
           if ($env:LICENSE) {
