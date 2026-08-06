@@ -160,7 +160,7 @@ runs:
           if ($env:CHEF_DOWNLOAD_URL -eq "chefdownload-community.chef.io" -and $env:CHANNEL -ne "stable") {
             throw "The Chef Community API only supports the stable channel. Use chefdownload-commercial.chef.io or an omnitruck endpoint for current."
           }
-          $scriptUrl = "https://$env:CHEF_DOWNLOAD_URL/$scriptSuffix?license_id=$($env:LICENSE)"
+          $scriptUrl = "https://$env:CHEF_DOWNLOAD_URL/$($scriptSuffix)?license_id=$($env:LICENSE)"
         } else {
           if (-not $env:OMNITRUCK_URL) {
             throw "No install source configured. Set 'license' for Chef downloads or 'omnitruckUrl' for omnitruck-compatible installs."
@@ -187,7 +187,7 @@ runs:
           throw $message
         }
 
-        $effectiveUrl = $response.BaseResponse.ResponseUri.AbsoluteUri
+        $effectiveUrl = $response.BaseResponse.RequestMessage.RequestUri.AbsoluteUri
         if ($response.StatusCode -ne 200) {
           $message = "Failed to download installer from $scriptUrl (HTTP $($response.StatusCode))."
           if ($env:LICENSE) {
